@@ -65,7 +65,7 @@ RUN git clone https://github.com/coreutils/coreutils.git /coreutils && \
 
 # Build Coreutils with gcov (Step 1)
 RUN cd /coreutils && \
-    autoreconf -fiv && \   # Generate the configure script
+    autoreconf -fiv && \
     mkdir obj-gcov && cd obj-gcov && \
     ../configure --disable-nls CFLAGS="-g -fprofile-arcs -ftest-coverage" && \
     make && \
