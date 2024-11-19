@@ -1,9 +1,11 @@
 # Base image with Ubuntu
 FROM ubuntu:20.04
 
-
+# Avoid interactive prompts during build
 ENV DEBIAN_FRONTEND=noninteractive
-# Set timezone environment variables for non-interactive installation
+ENV LLVM_COMPILER=clang
+
+# Set timezone and install necessary packages
 RUN apt-get update && apt-get install -y \
     tzdata \
     build-essential \
@@ -37,28 +39,42 @@ RUN apt-get update && apt-get install -y \
 # Install WLLVM for compiling to LLVM bitcode
 RUN pip3 install --upgrade wllvm
 
-# Set WLLVM environment variables
-ENV LLVM_COMPILER=clang
-
-# Install uclibc for KLEE
+# Clone and build uClibc for KLEE
 RUN git clone https://github.com/klee/klee-uclibc.git /klee-uclibc && \
     cd /klee-uclibc && \
     ./configure --make-llvm-lib && make -j$(nproc)
 
-# Clone and build KLEE (separated for better caching)
+# Clone and build KLEE
 RUN git clone https://github.com/klee/klee.git /klee
 RUN cd /klee && \
     mkdir build && cd build && \
     cmake -DENABLE_SOLVERS=STP -DENABLE_POSIX_RUNTIME=ON -DENABLE_UNIT_TESTS=OFF -DENABLE_SYSTEM_TESTS=OFF -DKLEE_FORCE_64BIT=ON .. && \
     make -j$(nproc) VERBOSE=1 && make install
 
-# Set environment variables for KLEE
+# Add KLEE binaries to PATH
 ENV PATH="/klee/build/bin:$PATH"
 ENV LD_LIBRARY_PATH="/klee/build/lib:$LD_LIBRARY_PATH"
 
-# Clone GNU Coreutils 6.11
+# Clone Coreutils 6.11
 RUN git clone https://github.com/coreutils/coreutils.git /coreutils && \
     cd /coreutils && git checkout v6.11
 
-# Set working directory to Coreutils
+# Set working directory for Coreutils
 WORKDIR /coreutils
+
+# Build Coreutils with gcov (Step 1)
+RUN mkdir obj-gcov && cd obj-gcov && \
+    ../configure --disable-nls CFLAGS="-g -fprofile-arcs -ftest-coverage" && \
+    make && \
+    make -C src arch hostname
+
+# Build Coreutils with LLVM (Step 3)
+RUN mkdir obj-llvm && cd obj-llvm && \
+    CC=wllvm ../configure --disable-nls CFLAGS="-g -O1 -Xclang -disable-llvm-passes -D__NO_STRING_INLINES -D_FORTIFY_SOURCE=0 -U__OPTIMIZE__" && \
+    make && \
+    make -C src arch hostname && \
+    cd src && \
+    find . -executable -type f | xargs -I '{}' extract-bc '{}'
+
+# Set default command to run a shell
+CMD ["/bin/bash"]
