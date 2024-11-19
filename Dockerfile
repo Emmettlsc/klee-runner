@@ -1,6 +1,9 @@
 # Use a pre-built KLEE Docker image
 FROM klee/klee:latest
 
+# Ensure root privileges for required commands
+USER root
+
 # Download and extract Coreutils 6.11
 RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-6.11.tar.gz && \
     tar -xzf coreutils-6.11.tar.gz && \
