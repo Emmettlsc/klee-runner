@@ -64,8 +64,15 @@ ENV LD_LIBRARY_PATH="/klee/build/lib:$LD_LIBRARY_PATH"
 RUN git clone https://github.com/coreutils/coreutils.git /coreutils && \
     cd /coreutils && git checkout v6.11
 
+ENV LD_LIBRARY_PATH="/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
+
+# Bucket for steps I forgot so I can used cache
+RUN apt-get update && apt-get install -y \
+    libtool
+
 # Build Coreutils with gcov (Step 1)
 RUN cd /coreutils && \
+    git submodule update --init --recursive && \
     autoreconf -fiv && \
     mkdir obj-gcov && cd obj-gcov && \
     ../configure --disable-nls CFLAGS="-g -fprofile-arcs -ftest-coverage" && \
