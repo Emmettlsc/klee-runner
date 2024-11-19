@@ -4,6 +4,16 @@ FROM klee/klee:latest
 # Ensure root privileges for required commands
 USER root
 
+# Install dependencies for wllvm
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    gawk && \
+    pip3 install wllvm
+
+# Set environment variables for wllvm
+ENV LLVM_COMPILER=clang
+ENV LLVM_CONFIG=/usr/lib/llvm-11/bin/llvm-config
+
 # Download and extract Coreutils 8.32
 RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.gz && \
     tar -xzf coreutils-8.32.tar.gz && \
