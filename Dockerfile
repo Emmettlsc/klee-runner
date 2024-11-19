@@ -59,15 +59,14 @@ RUN cd /klee && \
 ENV PATH="/klee/build/bin:$PATH"
 ENV LD_LIBRARY_PATH="/klee/build/lib:$LD_LIBRARY_PATH"
 
-# Clone Coreutils 6.11
+# Clone GNU Coreutils 6.11
 RUN git clone https://github.com/coreutils/coreutils.git /coreutils && \
     cd /coreutils && git checkout v6.11
 
-# Set working directory for Coreutils
-WORKDIR /coreutils
-
 # Build Coreutils with gcov (Step 1)
-RUN mkdir obj-gcov && cd obj-gcov && \
+RUN cd /coreutils && \
+    autoreconf -fiv && \   # Generate the configure script
+    mkdir obj-gcov && cd obj-gcov && \
     ../configure --disable-nls CFLAGS="-g -fprofile-arcs -ftest-coverage" && \
     make && \
     make -C src arch hostname
