@@ -4,6 +4,7 @@ FROM klee/klee:latest
 # Download and extract Coreutils 6.11
 RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-6.11.tar.gz && \
     tar -xzf coreutils-6.11.tar.gz && \
+    mv coreutils-6.11 /coreutils-6.11 && \
     rm coreutils-6.11.tar.gz
 
 # Build Coreutils with gcov (Step 1)
