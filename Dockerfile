@@ -44,6 +44,10 @@ RUN git clone https://github.com/klee/klee-uclibc.git /klee-uclibc && \
     cd /klee-uclibc && \
     ./configure --make-llvm-lib && make -j$(nproc)
 
+RUN apt-get install -y llvm-12 llvm-12-dev clang-12
+ENV LLVM_CONFIG=/usr/bin/llvm-config-12
+ENV PATH="/usr/lib/llvm-12/bin:$PATH"
+
 # Clone and build KLEE
 RUN git clone https://github.com/klee/klee.git /klee
 RUN cd /klee && \
