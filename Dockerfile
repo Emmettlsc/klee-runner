@@ -52,13 +52,13 @@ ENV CXX=clang++-${LLVM_VERSION}
 # Install WLLVM
 RUN pip3 install --upgrade wllvm
 
-# Install GMP library and development files
+# use snap bruh
 RUN apt-get update && apt-get install -y \
-    libgmp-dev \
-    libgmpxx4ldbl
-
-RUN apt-get update && apt-get install -y \
-    pkg-config
+    pkg-config \
+    snapd && \
+    ln -s /var/lib/snapd/snap /snap && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install STP solver
 RUN git clone https://github.com/stp/stp.git /stp && \
@@ -69,30 +69,11 @@ RUN git clone https://github.com/stp/stp.git /stp && \
              -DENABLE_PYTHON_INTERFACE=OFF && \
     make -j$(nproc) && make install
 
-# Install KLEE-uClibc
-RUN git clone https://github.com/klee/klee-uclibc.git /klee-uclibc && \
-    cd /klee-uclibc && \
-    ./configure --make-llvm-lib && \
-    make -j$(nproc)
+# Install KLEE using Snap
+RUN snap install klee --classic
 
-# Install KLEE
-RUN git clone https://github.com/klee/klee.git /klee && \
-    cd /klee && \
-    mkdir build && cd build && \
-    cmake .. \
-        -DENABLE_SOLVER_STP=ON \
-        -DENABLE_POSIX_RUNTIME=ON \
-        -DENABLE_KLEE_UCLIBC=ON \
-        -DKLEE_UCLIBC_PATH=/klee-uclibc \
-        -DLLVM_CONFIG_BINARY=${LLVM_DIR}/bin/llvm-config \
-        -DENABLE_UNIT_TESTS=OFF \
-        -DENABLE_SYSTEM_TESTS=OFF \
-        -DCMAKE_BUILD_TYPE=Release && \
-    make -j$(nproc) && make install
-
-# Update PATH for KLEE
-ENV PATH="/klee/build/bin:${PATH}"
-ENV LD_LIBRARY_PATH="/klee/build/lib:${LD_LIBRARY_PATH}"
+# Update PATH to include Snap binaries
+ENV PATH="/snap/bin:${PATH}"
 
 # Download and extract Coreutils 6.11
 RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-6.11.tar.gz && \
