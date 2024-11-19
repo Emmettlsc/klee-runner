@@ -10,6 +10,11 @@ RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-6.11.tar.gz && \
     mv coreutils-6.11 /coreutils-6.11 && \
     rm coreutils-6.11.tar.gz
 
+# Download and apply the patch for glibc-2.28 compatibility
+RUN wget -O /coreutils-6.11-on-glibc-2.28.diff https://example.com/patches/coreutils-6.11-on-glibc-2.28.diff && \
+    cd /coreutils-6.11 && \
+    patch -p1 < /coreutils-6.11-on-glibc-2.28.diff
+
 # Build Coreutils with gcov (Step 1)
 RUN cd /coreutils-6.11 && \
     mkdir obj-gcov && cd obj-gcov && \
@@ -25,5 +30,8 @@ RUN cd /coreutils-6.11 && \
     make -C src arch hostname && \
     cd src && \
     find . -executable -type f | xargs -I '{}' extract-bc '{}'
+
+# Switch back to the original user for security
+USER klee
 
 CMD ["/bin/bash"]
