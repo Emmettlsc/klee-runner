@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     automake \
     texinfo \
     gettext \
+    autopoint \
     kcachegrind \
     emacs \
     libboost-all-dev \
