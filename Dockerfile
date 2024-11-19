@@ -52,6 +52,14 @@ ENV CXX=clang++-${LLVM_VERSION}
 # Install WLLVM
 RUN pip3 install --upgrade wllvm
 
+# Install GMP library and development files
+RUN apt-get update && apt-get install -y \
+    libgmp-dev \
+    libgmpxx4ldbl
+
+RUN apt-get update && apt-get install -y \
+    pkg-config
+
 # Install STP solver
 RUN git clone https://github.com/stp/stp.git /stp && \
     cd /stp && \
