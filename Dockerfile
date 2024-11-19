@@ -60,15 +60,6 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install STP solver
-RUN git clone https://github.com/stp/stp.git /stp && \
-    cd /stp && \
-    mkdir build && cd build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-             -DCMAKE_BUILD_TYPE=Release \
-             -DENABLE_PYTHON_INTERFACE=OFF && \
-    make -j$(nproc) && make install
-
 # Install KLEE using Snap
 RUN snap install klee --classic
 
