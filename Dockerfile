@@ -11,7 +11,7 @@ RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-6.11.tar.gz && \
     rm coreutils-6.11.tar.gz
 
 # Download and apply the patch for glibc-2.28 compatibility
-RUN wget -O /coreutils-6.11-on-glibc-2.28.diff https://github.com/coreutils/coreutils/tree/master/scripts/build-older-versions/coreutils-6.11-on-glibc-2.28.diff && \
+RUN wget -O /coreutils-6.11-on-glibc-2.28.diff https://raw.githubusercontent.com/coreutils/coreutils/master/scripts/build-older-versions/coreutils-6.11-on-glibc-2.28.diff && \
     cd /coreutils-6.11 && \
     patch -p1 < /coreutils-6.11-on-glibc-2.28.diff
 
