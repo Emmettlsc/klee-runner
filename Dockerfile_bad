@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
 
 # Set environment variables for wllvm
 ENV LLVM_COMPILER=clang
-ENV LLVM_CONFIG=$(which llvm-config)
+ENV LLVM_CONFIG=/usr/lib/llvm-11/bin/llvm-config
 
 # Build arguments for repository URL and branch
 ARG REPO_URL=https://github.com/Emmettlsc/coreutils-klee-demo-bad.git
