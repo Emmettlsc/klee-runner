@@ -4,16 +4,11 @@ FROM klee/klee:latest
 # Ensure root privileges for required commands
 USER root
 
-# Download and extract Coreutils 6.11
-RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-6.11.tar.gz && \
-    tar -xzf coreutils-6.11.tar.gz && \
-    mv coreutils-6.11 /coreutils-6.11 && \
-    rm coreutils-6.11.tar.gz
-
-# Download and apply the patch for glibc-2.28 compatibility
-RUN wget -O /coreutils-6.11-on-glibc-2.28.diff https://raw.githubusercontent.com/coreutils/coreutils/master/scripts/build-older-versions/coreutils-6.11-on-glibc-2.28.diff && \
-    cd /coreutils-6.11 && \
-    patch -p1 < /coreutils-6.11-on-glibc-2.28.diff
+# Download and extract Coreutils 8.32
+RUN wget http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.gz && \
+    tar -xzf coreutils-8.32.tar.gz && \
+    mv coreutils-8.32 /coreutils-8.32 && \
+    rm coreutils-8.32.tar.gz
 
 # Build Coreutils with gcov (Step 1)
 RUN cd /coreutils-6.11 && \
